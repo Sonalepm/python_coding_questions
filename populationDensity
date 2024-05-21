@@ -1,0 +1,16 @@
+# Import your libraries
+import pandas as pd
+
+# Start writing code
+#cities_population.head()
+
+cities_population = cities_population[cities_population['area']!=0]
+cities_population['density'] = round(cities_population['population']/cities_population['area'])
+cities_population= cities_population[['city','country','density']]
+
+
+
+
+Population Density
+
+https://platform.stratascratch.com/coding/10368-population-density?code_type=2
