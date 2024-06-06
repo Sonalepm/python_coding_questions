@@ -6,17 +6,17 @@ from datetime import datetime
 log_file = "log_file.txt"
 target_file = "transformed_data.csv"
 
--- extract csv file
+#extract csv file
 def extract_from_csv(input_file):
     dataframe = pd.read_csv(input_file)
     return dataframe
 
--- extract json file
+#extract json file
 def extract_from_json(input_file):
     datagrame = pd.read_json(input_file,lines=True)
     return dataframe
 
---extract xml file
+#extract xml file
 def extract_from_xml(input_file):
     dataframe = pd.DataFrame(columns = ["name","height","weight"])
     tree = ET.parse(input_file)
