@@ -6,19 +6,22 @@ from datetime import datetime
 log_file = "log_file.txt"
 target_file = "transformed_data.csv"
 
-#extract csv file
+
+### Extract data 
+
+##extract csv file
 def extract_from_csv(input_file):
     dataframe = pd.read_csv(input_file)
     return dataframe
 
-#extract json file
+## extract json file
 def extract_from_json(input_file):
-    datagrame = pd.read_json(input_file,lines=True)
+    dataframe = pd.read_json(input_file,lines=True)
     return dataframe
 
-#extract xml file
+##extract xml file
 def extract_from_xml(input_file):
-    dataframe = pd.DataFrame(columns = ["name","height","weight"])
+    dataframe = pd.DataFrame()
     tree = ET.parse(input_file)
     root = tree.getroot()
     for person in root:
@@ -29,7 +32,7 @@ def extract_from_xml(input_file):
     return dataframe
 
 def extract(): 
-    extracted_data = pd.DataFrame(columns=['name','height','weight']) # create an empty data frame to hold extracted data 
+    extracted_data = pd.DataFrame() # create an empty data frame to hold extracted data 
      
     # process all csv files 
     for csvfile in glob.glob("*.csv"): 
@@ -44,3 +47,57 @@ def extract():
         extracted_data = pd.concat([extracted_data, pd.DataFrame(extract_from_xml(xmlfile))], ignore_index=True) 
          
     return extracted_data 
+
+## Transform Data
+def transform(data): 
+    '''Convert inches to meters and round off to two decimals 
+    1 inch is 0.0254 meters '''
+    data['height'] = round(data.height * 0.0254,2) 
+ 
+    '''Convert pounds to kilograms and round off to two decimals 
+    1 pound is 0.45359237 kilograms '''
+    data['weight'] = round(data.weight * 0.45359237,2) 
+    
+    return data 
+
+## Load Data to csv, Add logs
+
+def load_data(target_file, transformed_data): 
+    transformed_data.to_csv(target_file) 
+
+def log_progress(message): 
+    timestamp_format = '%Y-%h-%d-%H:%M:%S' # Year-Monthname-Day-Hour-Minute-Second 
+    now = datetime.now() # get current timestamp 
+    timestamp = now.strftime(timestamp_format) 
+    with open(log_file,"a") as f: 
+        f.write(timestamp + ',' + message + '\n') 
+
+
+# Log the initialization of the ETL process 
+log_progress("ETL Job Started") 
+ 
+# Log the beginning of the Extraction process 
+log_progress("Extract phase Started") 
+extracted_data = extract() 
+ 
+# Log the completion of the Extraction process 
+log_progress("Extract phase Ended") 
+ 
+# Log the beginning of the Transformation process 
+log_progress("Transform phase Started") 
+transformed_data = transform(extracted_data) 
+print("Transformed Data") 
+print(transformed_data) 
+ 
+# Log the completion of the Transformation process 
+log_progress("Transform phase Ended") 
+ 
+# Log the beginning of the Loading process 
+log_progress("Load phase Started") 
+load_data(target_file,transformed_data) 
+ 
+# Log the completion of the Loading process 
+log_progress("Load phase Ended") 
+ 
+# Log the completion of the ETL process 
+log_progress("ETL Job Ended") 
